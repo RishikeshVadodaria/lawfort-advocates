@@ -1,61 +1,54 @@
-// Navbar scroll effect
-const navbar = document.getElementById('navbar');
+// Navbar scroll
+const nav = document.querySelector('.nav');
 window.addEventListener('scroll', () => {
-    navbar.classList.toggle('scrolled', window.scrollY > 50);
+    nav.classList.toggle('scrolled', window.scrollY > 60);
 });
 
-// Mobile nav toggle
-const navToggle = document.querySelector('.nav-toggle');
-const navLinks = document.querySelector('.nav-links');
+// Mobile menu
+const toggle = document.querySelector('.nav-toggle');
+const mobileMenu = document.querySelector('.mobile-menu');
 
-navToggle.addEventListener('click', () => {
-    navLinks.classList.toggle('active');
-    const expanded = navToggle.getAttribute('aria-expanded') === 'true';
-    navToggle.setAttribute('aria-expanded', !expanded);
+toggle.addEventListener('click', () => {
+    const isActive = mobileMenu.classList.toggle('active');
+    toggle.querySelector('span').textContent = isActive ? 'CLOSE' : 'MENU';
 });
 
-// Close mobile nav on link click
-navLinks.querySelectorAll('a').forEach(link => {
+mobileMenu.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', () => {
-        navLinks.classList.remove('active');
-        navToggle.setAttribute('aria-expanded', 'false');
+        mobileMenu.classList.remove('active');
+        toggle.querySelector('span').textContent = 'MENU';
     });
 });
 
-// Service tabs
-const tabBtns = document.querySelectorAll('.tab-btn');
-const tabContents = document.querySelectorAll('.tab-content');
+// Scroll reveal
+const revealElements = document.querySelectorAll(
+    '.section-label, .split-content, .quote-block, .partners-row, ' +
+    '.expertise-grid, .service-category, .section-statement, ' +
+    '.clients-list, .contact-grid, .section-heading'
+);
 
-tabBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        const target = btn.dataset.tab;
-
-        tabBtns.forEach(b => b.classList.remove('active'));
-        tabContents.forEach(c => c.classList.remove('active'));
-
-        btn.classList.add('active');
-        document.getElementById(target).classList.add('active');
-    });
-});
-
-// Smooth reveal on scroll
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
+revealElements.forEach(el => el.classList.add('reveal'));
 
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
+            entry.target.classList.add('visible');
         }
     });
-}, observerOptions);
+}, {
+    threshold: 0.1,
+    rootMargin: '0px 0px -60px 0px'
+});
 
-document.querySelectorAll('.section').forEach(section => {
-    section.style.opacity = '0';
-    section.style.transform = 'translateY(20px)';
-    section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-    observer.observe(section);
+revealElements.forEach(el => observer.observe(el));
+
+// Smooth anchor scroll (fallback)
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
 });
