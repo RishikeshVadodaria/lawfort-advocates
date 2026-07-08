@@ -20,11 +20,23 @@ mobileMenu.querySelectorAll('a').forEach(link => {
     });
 });
 
+// Parallax on hero image
+const heroImg = document.querySelector('.hero-img');
+if (heroImg) {
+    window.addEventListener('scroll', () => {
+        const scroll = window.scrollY;
+        if (scroll < window.innerHeight) {
+            heroImg.style.transform = `scale(1.1) translateY(${scroll * 0.15}px)`;
+        }
+    });
+}
+
 // Scroll reveal
 const revealElements = document.querySelectorAll(
     '.section-label, .split-content, .quote-block, .partners-row, ' +
-    '.expertise-grid, .service-category, .section-statement, ' +
-    '.clients-list, .contact-grid, .section-heading'
+    '.expertise-grid, .service-category, .section-statement .section-inner, ' +
+    '.clients-list, .contact-grid, .section-heading, .section-desc, ' +
+    '.stats-row, .about-image, .image-divider, .retainer-card'
 );
 
 revealElements.forEach(el => el.classList.add('reveal'));
@@ -42,7 +54,27 @@ const observer = new IntersectionObserver((entries) => {
 
 revealElements.forEach(el => observer.observe(el));
 
-// Smooth anchor scroll (fallback)
+// Stagger service cards
+const serviceCards = document.querySelectorAll('.service-card');
+const cardObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+            setTimeout(() => {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }, i * 80);
+        }
+    });
+}, { threshold: 0.1 });
+
+serviceCards.forEach(card => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    cardObserver.observe(card);
+});
+
+// Smooth anchor scroll
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function(e) {
         const target = document.querySelector(this.getAttribute('href'));
